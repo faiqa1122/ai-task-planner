@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("caec5077-0959-443f-8d19-25f7bfd43ff7")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("TaskPlanner.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+129a0dd6078ea2af4d33bef39b6f710eb9cd06a0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fd17f2d147e56ad00b0c7679db61039de47f7db2")]
 [assembly: System.Reflection.AssemblyProductAttribute("TaskPlanner.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TaskPlanner.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
