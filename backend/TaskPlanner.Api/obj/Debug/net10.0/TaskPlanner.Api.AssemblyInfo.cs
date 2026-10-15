@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TaskPlanner.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a57394d6b14d5260258a7b47e4222b14e714ca49")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+49456c9591ef66bac270029b46aa0173f618311c")]
 [assembly: System.Reflection.AssemblyProductAttribute("TaskPlanner.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TaskPlanner.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
