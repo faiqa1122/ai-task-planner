@@ -8,55 +8,43 @@ import { AuthService } from '../../core/auth.service';
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
   template: `
-    <div class="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow">
-        <h1 class="text-2xl font-bold text-indigo-600">AI Task Planner</h1>
-        <p class="mt-1 text-sm text-gray-500">Log in to continue</p>
+    <div class="flex min-h-screen items-center justify-center p-4">
+  <div class="panel w-full max-w-md p-8">
+    <div class="text-2xl font-bold">Task<span class="text-accent">Planner</span></div>
+    <p class="mt-1 text-sm text-muted">Log in to continue</p>
 
-        <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              formControlName="email"
-              class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none"
-            />
-            @if (form.controls.email.touched && form.controls.email.invalid) {
-              <p class="mt-1 text-xs text-red-600">Enter a valid email.</p>
-            }
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              formControlName="password"
-              class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none"
-            />
-            @if (form.controls.password.touched && form.controls.password.invalid) {
-              <p class="mt-1 text-xs text-red-600">Password is required.</p>
-            }
-          </div>
-
-          @if (error()) {
-            <p class="rounded-lg bg-red-50 p-2 text-sm text-red-700">{{ error() }}</p>
-          }
-
-          <button
-            type="submit"
-            [disabled]="loading()"
-            class="w-full rounded-lg bg-indigo-600 p-2 font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-          >
-            {{ loading() ? 'Logging in...' : 'Log in' }}
-          </button>
-        </form>
-
-        <p class="mt-4 text-center text-sm text-gray-600">
-          No account?
-          <a routerLink="/register" class="font-medium text-indigo-600 hover:underline">Register</a>
-        </p>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
+      <div>
+        <label class="label">Email</label>
+        <input type="email" formControlName="email" class="field" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <p class="error-text mt-1">Enter a valid email.</p>
+        }
       </div>
-    </div>
+
+      <div>
+        <label class="label">Password</label>
+        <input type="password" formControlName="password" class="field" />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <p class="error-text mt-1">Password is required.</p>
+        }
+      </div>
+
+      @if (error()) {
+        <p class="error-box">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="loading()" class="btn w-full">
+        {{ loading() ? 'Logging in...' : 'Log in' }}
+      </button>
+    </form>
+
+    <p class="mt-4 text-center text-sm text-muted">
+      No account?
+      <a routerLink="/register" class="font-semibold text-accent hover:underline">Register</a>
+    </p>
+  </div>
+</div>
   `,
 })
 export class LoginComponent {

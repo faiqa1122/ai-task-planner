@@ -10,160 +10,147 @@ import { GoalSummary, Priority, TaskItem, TaskStatus } from '../../core/models';
   selector: 'app-goal-detail',
   imports: [RouterLink, DatePipe],
   template: `
-    <a routerLink="/goals" class="text-sm text-indigo-600 hover:underline">← Back to goals</a>
+    <a routerLink="/goals" class="text-sm text-muted hover:text-accent">← Back to goals</a>
 
-    @if (loading()) {
-      <p class="mt-4 text-gray-500">Loading...</p>
-    } @else if (goal()) {
-      <div class="mt-3 rounded-2xl bg-white p-5 shadow">
-        <h1 class="text-xl font-semibold text-gray-800">{{ goal()!.title }}</h1>
-        @if (goal()!.description) {
-          <p class="mt-1 text-sm text-gray-600">{{ goal()!.description }}</p>
-        }
-        @if (goal()!.deadline) {
-          <p class="mt-1 text-xs text-gray-500">
-            Deadline: {{ goal()!.deadline | date: 'mediumDate' }}
-          </p>
-        }
-        <div class="mt-3 h-2 rounded-full bg-gray-200">
-          <div class="h-2 rounded-full bg-indigo-600" [style.width.%]="percent()"></div>
-        </div>
-        <p class="mt-1 text-xs text-gray-500">
-          {{ doneCount() }} of {{ tasks().length }} tasks done ({{ percent() }}%)
-        </p>
-      </div>
-
-      @if (error()) {
-        <p class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ error() }}</p>
+@if (loading()) {
+  <p class="mt-4 text-muted">Loading...</p>
+} @else if (goal()) {
+  <div class="mt-4 flex items-end justify-between gap-4">
+    <div>
+      <p class="label">Goal</p>
+      <h1 class="mt-1 text-3xl font-semibold">{{ goal()!.title }}</h1>
+      @if (goal()!.description) {
+        <p class="mt-1 text-sm text-muted">{{ goal()!.description }}</p>
       }
+      @if (goal()!.deadline) {
+        <p class="mt-1 text-xs text-muted">Deadline: {{ goal()!.deadline | date: 'mediumDate' }}</p>
+      }
+    </div>
+    <div class="text-5xl leading-none font-bold text-accent">{{ percent() }}%</div>
+  </div>
 
-      <div class="mt-4 grid gap-4 md:grid-cols-3">
-        @for (col of columns(); track col.status) {
-          <div class="rounded-2xl bg-gray-100 p-3">
-            <h2 class="mb-3 flex justify-between text-sm font-semibold text-gray-700">
-              <span>{{ col.label }}</span>
-              <span>{{ col.items.length }}</span>
-            </h2>
+  <div class="mt-4 h-2 rounded-full bg-line">
+    <div class="h-2 rounded-full bg-accent" [style.width.%]="percent()"></div>
+  </div>
+  <p class="mt-2 text-xs text-muted">{{ doneCount() }} of {{ tasks().length }} tasks done</p>
 
-            <div class="space-y-3">
-              @for (t of col.items; track t.id) {
-                <div class="rounded-xl bg-white p-3 shadow-sm">
-                  @if (editingId() === t.id) {
-                    <input
-                      type="text"
-                      [value]="editTitle()"
-                      (input)="editTitle.set(text($event))"
-                      class="w-full rounded-lg border border-gray-300 p-2 text-sm focus:border-indigo-500 focus:outline-none"
-                    />
-                    <div class="mt-2 flex gap-2">
-                      <select
-                        (change)="editPriority.set(priority($event))"
-                        class="rounded-lg border border-gray-300 p-2 text-sm"
-                      >
-                        @for (p of priorities; track p) {
-                          <option [value]="p" [selected]="editPriority() === p">{{ p }}</option>
-                        }
-                      </select>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.5"
-                        [value]="editHours() ?? ''"
-                        (input)="editHours.set(num($event))"
-                        placeholder="Hours"
-                        class="w-20 rounded-lg border border-gray-300 p-2 text-sm focus:border-indigo-500 focus:outline-none"
-                      />
-                    </div>
-                    <div class="mt-2 flex gap-2">
-                      <button
-                        (click)="saveEdit(t)"
-                        class="rounded-lg bg-indigo-600 px-3 py-1 text-xs text-white hover:bg-indigo-700"
-                      >
-                        Save
-                      </button>
-                      <button
-                        (click)="editingId.set(null)"
-                        class="rounded-lg border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  } @else {
-                    <p class="text-sm font-medium text-gray-800">{{ t.title }}</p>
-                    @if (t.description) {
-                      <p class="mt-1 text-xs text-gray-500">{{ t.description }}</p>
-                    }
-                    <div class="mt-2 flex items-center gap-2 text-xs">
-                      <span [class]="badge(t.priority)">{{ t.priority }}</span>
-                      @if (t.estimatedHours) {
-                        <span class="text-gray-500">{{ t.estimatedHours }}h</span>
-                      }
-                    </div>
-                    <div class="mt-2 flex items-center justify-between">
-                      <div class="flex gap-1">
-                        @if (canMove(t, -1)) {
-                          <button
-                            (click)="move(t, -1)"
-                            class="rounded border border-gray-300 px-2 text-sm hover:bg-gray-100"
-                            aria-label="Move back"
-                          >
-                            ←
-                          </button>
-                        }
-                        @if (canMove(t, 1)) {
-                          <button
-                            (click)="move(t, 1)"
-                            class="rounded border border-gray-300 px-2 text-sm hover:bg-gray-100"
-                            aria-label="Move forward"
-                          >
-                            →
-                          </button>
-                        }
-                      </div>
-                      <div class="flex gap-1">
-                        <button
-                          (click)="startEdit(t)"
-                          class="rounded px-2 text-sm text-gray-600 hover:bg-gray-100"
-                          aria-label="Edit task"
-                        >
-                          ✎
-                        </button>
-                        <button
-                          (click)="removeTask(t)"
-                          class="rounded px-2 text-sm text-red-600 hover:bg-red-50"
-                          aria-label="Delete task"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
+  @if (error()) {
+    <p class="error-box mt-4">{{ error() }}</p>
+  }
+
+  <div class="mt-6 grid gap-4 md:grid-cols-3">
+    @for (col of columns(); track col.status) {
+      <div class="panel space-y-3 p-3.5">
+        <h2 class="flex justify-between text-xs font-semibold tracking-wider text-muted uppercase">
+          <span>{{ col.label }}</span>
+          <span>{{ col.items.length }}</span>
+        </h2>
+
+        @for (t of col.items; track t.id) {
+          <div class="card">
+            @if (editingId() === t.id) {
+              <input
+                type="text"
+                [value]="editTitle()"
+                (input)="editTitle.set(text($event))"
+                class="field mt-0"
+              />
+              <div class="mt-2 flex gap-2">
+                <select (change)="editPriority.set(priority($event))" class="field mt-0 w-auto">
+                  @for (p of priorities; track p) {
+                    <option [value]="p" [selected]="editPriority() === p">{{ p }}</option>
+                  }
+                </select>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  [value]="editHours() ?? ''"
+                  (input)="editHours.set(num($event))"
+                  placeholder="Hours"
+                  class="field mt-0 w-20"
+                />
+              </div>
+              <div class="mt-2 flex gap-2">
+                <button (click)="saveEdit(t)" class="btn px-3 py-1 text-xs">Save</button>
+                <button (click)="editingId.set(null)" class="btn-ghost px-3 py-1 text-xs">Cancel</button>
+              </div>
+            } @else {
+              <p
+                class="text-sm font-semibold"
+                [class.text-muted]="t.status === 'Done'"
+                [class.line-through]="t.status === 'Done'"
+              >
+                {{ t.title }}
+              </p>
+              @if (t.description) {
+                <p class="mt-1 text-xs text-muted">{{ t.description }}</p>
+              }
+              <div class="mt-2 flex items-center gap-2 text-xs">
+                <span [class]="badge(t.priority)">{{ t.priority }}</span>
+                @if (t.estimatedHours) {
+                  <span class="text-muted">{{ t.estimatedHours }}h</span>
+                }
+              </div>
+              <div class="mt-3 flex items-center justify-between">
+                <div class="flex gap-1">
+                  @if (canMove(t, -1)) {
+                    <button
+                      (click)="move(t, -1)"
+                      class="rounded-md border border-line-strong px-2 text-sm text-muted hover:text-ink"
+                      aria-label="Move back"
+                    >
+                      ←
+                    </button>
+                  }
+                  @if (canMove(t, 1)) {
+                    <button
+                      (click)="move(t, 1)"
+                      class="rounded-md border border-line-strong px-2 text-sm text-muted hover:text-ink"
+                      aria-label="Move forward"
+                    >
+                      →
+                    </button>
                   }
                 </div>
-              }
-            </div>
+                <div class="flex gap-1">
+                  <button
+                    (click)="startEdit(t)"
+                    class="rounded-md px-2 text-sm text-muted hover:text-ink"
+                    aria-label="Edit task"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    (click)="removeTask(t)"
+                    class="rounded-md px-2 text-sm text-high hover:bg-high-bg"
+                    aria-label="Delete task"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            }
           </div>
         }
       </div>
-
-      <div class="mt-4 flex gap-2 rounded-2xl bg-white p-4 shadow">
-        <input
-          type="text"
-          [value]="newTitle()"
-          (input)="newTitle.set(text($event))"
-          (keyup.enter)="addTask()"
-          placeholder="Add a new task..."
-          class="flex-1 rounded-lg border border-gray-300 p-2 text-sm focus:border-indigo-500 focus:outline-none"
-        />
-        <button
-          (click)="addTask()"
-          class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-        >
-          Add
-        </button>
-      </div>
-    } @else {
-      <p class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ error() }}</p>
     }
+  </div>
+
+  <div class="panel mt-4 flex gap-2">
+    <input
+      type="text"
+      [value]="newTitle()"
+      (input)="newTitle.set(text($event))"
+      (keyup.enter)="addTask()"
+      placeholder="Add a new task..."
+      class="field mt-0 flex-1"
+    />
+    <button (click)="addTask()" class="btn">Add</button>
+  </div>
+} @else {
+  <p class="error-box mt-4">{{ error() }}</p>
+}
   `,
 })
 export class GoalDetailComponent implements OnInit {
@@ -300,14 +287,14 @@ export class GoalDetailComponent implements OnInit {
     });
   }
 
-  badge(p: Priority): string {
+    badge(p: Priority): string {
     switch (p) {
       case 'High':
-        return 'rounded-full bg-red-100 px-2 py-0.5 text-red-700';
+        return 'chip chip-high';
       case 'Medium':
-        return 'rounded-full bg-amber-100 px-2 py-0.5 text-amber-700';
+        return 'chip chip-medium';
       default:
-        return 'rounded-full bg-green-100 px-2 py-0.5 text-green-700';
+        return 'chip chip-low';
     }
   }
 

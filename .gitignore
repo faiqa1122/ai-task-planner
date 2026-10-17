@@ -19,3 +19,4 @@ dist/
 # Editor / OS
 .vscode/
 .DS_Store
+publish/

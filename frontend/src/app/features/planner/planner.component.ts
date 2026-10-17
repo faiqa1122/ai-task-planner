@@ -9,144 +9,119 @@ import { GoalSummary, PlannedTask, Priority } from '../../core/models';
   selector: 'app-planner',
   imports: [ReactiveFormsModule],
   template: `
-    <div class="mx-auto max-w-4xl p-6">
-      
-      <!-- Step 1: goal form -->
-      <form [formGroup]="form" (ngSubmit)="generate()" class="mt-6 space-y-4 rounded-2xl bg-white p-6 shadow">
-        <h2 class="text-lg font-semibold text-gray-800">What is your goal?</h2>
+   <div class="space-y-6">
+  <div>
+    <p class="label">New plan</p>
+    <h1 class="mt-1 text-3xl font-semibold">What is your goal?</h1>
+  </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Goal</label>
-          <input
-            type="text"
-            formControlName="title"
-            placeholder="e.g. Finish my final year project in 6 weeks"
-            class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none"
-          />
-          @if (form.controls.title.touched && form.controls.title.invalid) {
-            <p class="mt-1 text-xs text-red-600">Goal must be 5 to 200 characters.</p>
-          }
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Details (optional)</label>
-          <textarea
-            formControlName="description"
-            rows="3"
-            placeholder="e.g. Angular and .NET web app, I can work 2 hours daily"
-            class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none"
-          ></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Deadline (optional)</label>
-          <input
-            type="date"
-            formControlName="deadline"
-            class="mt-1 rounded-lg border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none"
-          />
-        </div>
-
-        <button
-          type="submit"
-          [disabled]="generating() || saving()"
-          class="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-        >
-          {{ generating() ? 'AI is planning...' : 'Generate plan' }}
-        </button>
-      </form>
-
-      @if (error()) {
-        <p class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ error() }}</p>
-      }
-
-      <!-- Step 3: saved message -->
-      @if (saved(); as goal) {
-        <div class="mt-6 rounded-2xl bg-green-50 p-6 text-green-800">
-          <p class="font-semibold">Plan saved!</p>
-          <p class="mt-1 text-sm">"{{ goal.title }}" was saved with {{ goal.taskCount }} tasks.</p>
-          <button
-            (click)="reset()"
-            class="mt-3 rounded-lg border border-green-600 px-3 py-1 text-sm hover:bg-green-100"
-          >
-            Plan another goal
-          </button>
-        </div>
-      }
-
-      <!-- Step 2: preview and edit -->
-      @if (hasPreview() && !saved()) {
-        <div class="mt-6 rounded-2xl bg-white p-6 shadow">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-gray-800">Review your plan</h2>
-            <span class="text-sm text-gray-500">{{ tasks().length }} tasks, {{ totalHours() }} hours</span>
-          </div>
-          <p class="mt-1 text-sm text-gray-500">Edit anything you want, then save.</p>
-
-          <div class="mt-4 space-y-3">
-            @for (t of tasks(); track $index) {
-              <div class="rounded-xl border border-gray-200 p-3">
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    [value]="t.title"
-                    (input)="updateTask($index, { title: text($event) })"
-                    placeholder="Task title"
-                    class="flex-1 rounded-lg border border-gray-300 p-2 text-sm focus:border-indigo-500 focus:outline-none"
-                  />
-                  <select
-                    (change)="updateTask($index, { priority: priority($event) })"
-                    class="rounded-lg border border-gray-300 p-2 text-sm"
-                  >
-                    @for (p of priorities; track p) {
-                      <option [value]="p" [selected]="t.priority === p">{{ p }}</option>
-                    }
-                  </select>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    [value]="t.estimatedHours ?? ''"
-                    (input)="updateTask($index, { estimatedHours: num($event) })"
-                    placeholder="Hours"
-                    class="w-20 rounded-lg border border-gray-300 p-2 text-sm focus:border-indigo-500 focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    (click)="removeTask($index)"
-                    class="rounded-lg px-2 text-red-600 hover:bg-red-50"
-                    aria-label="Remove task"
-                  >
-                    ✕
-                  </button>
-                </div>
-                @if (t.description) {
-                  <p class="mt-2 text-xs text-gray-500">{{ t.description }}</p>
-                }
-              </div>
-            }
-          </div>
-
-          <div class="mt-4 flex gap-3">
-            <button
-              type="button"
-              (click)="addTask()"
-              class="rounded-lg border border-gray-300 px-3 py-2 text-sm hover:bg-gray-100"
-            >
-              + Add task
-            </button>
-            <button
-              type="button"
-              (click)="save()"
-              [disabled]="saving() || generating()"
-              class="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-            >
-              {{ saving() ? 'Saving...' : 'Save plan' }}
-            </button>
-          </div>
-        </div>
+  <form [formGroup]="form" (ngSubmit)="generate()" class="panel space-y-4">
+    <div>
+      <label class="label">Goal</label>
+      <input
+        type="text"
+        formControlName="title"
+        placeholder="e.g. Finish my final year project in 6 weeks"
+        class="field"
+      />
+      @if (form.controls.title.touched && form.controls.title.invalid) {
+        <p class="error-text mt-1">Goal must be 5 to 200 characters.</p>
       }
     </div>
+
+    <div>
+      <label class="label">Details (optional)</label>
+      <textarea
+        formControlName="description"
+        rows="3"
+        placeholder="e.g. Angular and .NET web app, I can work 2 hours daily"
+        class="field"
+      ></textarea>
+    </div>
+
+    <div>
+      <label class="label">Deadline (optional)</label>
+      <input type="date" formControlName="deadline" class="field w-auto" />
+    </div>
+
+    <button type="submit" [disabled]="generating() || saving()" class="btn">
+      {{ generating() ? 'AI is planning...' : 'Generate plan' }}
+    </button>
+  </form>
+
+  @if (error()) {
+    <p class="error-box">{{ error() }}</p>
+  }
+
+  @if (saved(); as goal) {
+    <div class="panel border-accent/40">
+      <p class="font-semibold text-accent">Plan saved</p>
+      <p class="mt-1 text-sm text-muted">"{{ goal.title }}" was saved with {{ goal.taskCount }} tasks.</p>
+      <button (click)="reset()" class="btn-ghost mt-3">Plan another goal</button>
+    </div>
+  }
+
+  @if (hasPreview() && !saved()) {
+    <div class="panel">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Review your plan</h2>
+        <span class="text-sm text-muted">{{ tasks().length }} tasks, {{ totalHours() }} hours</span>
+      </div>
+      <p class="mt-1 text-sm text-muted">Edit anything you want, then save.</p>
+
+      <div class="mt-4 space-y-3">
+        @for (t of tasks(); track $index) {
+          <div class="card">
+            <div class="flex gap-2">
+              <input
+                type="text"
+                [value]="t.title"
+                (input)="updateTask($index, { title: text($event) })"
+                placeholder="Task title"
+                class="field mt-0 flex-1"
+              />
+              <select
+                (change)="updateTask($index, { priority: priority($event) })"
+                class="field mt-0 w-auto"
+              >
+                @for (p of priorities; track p) {
+                  <option [value]="p" [selected]="t.priority === p">{{ p }}</option>
+                }
+              </select>
+              <input
+                type="number"
+                min="0"
+                step="0.5"
+                [value]="t.estimatedHours ?? ''"
+                (input)="updateTask($index, { estimatedHours: num($event) })"
+                placeholder="Hours"
+                class="field mt-0 w-20"
+              />
+              <button
+                type="button"
+                (click)="removeTask($index)"
+                class="rounded-lg px-2 text-high hover:bg-high-bg"
+                aria-label="Remove task"
+              >
+                ✕
+              </button>
+            </div>
+            @if (t.description) {
+              <p class="mt-2 text-xs text-muted">{{ t.description }}</p>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mt-4 flex gap-3">
+        <button type="button" (click)="addTask()" class="btn-ghost">+ Add task</button>
+        <button type="button" (click)="save()" [disabled]="saving() || generating()" class="btn">
+          {{ saving() ? 'Saving...' : 'Save plan' }}
+        </button>
+      </div>
+    </div>
+  }
+</div>
   `,
 })
 export class PlannerComponent {

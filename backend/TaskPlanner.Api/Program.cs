@@ -50,12 +50,13 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+var allowedOrigins = (builder.Configuration["Cors:Origins"] ?? "http://localhost:4200")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+        policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod());
 });
 builder.Services.AddHttpClient<IAiPlannerService, GroqPlannerService>(client =>
 {
