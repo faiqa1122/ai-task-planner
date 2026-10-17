@@ -20,7 +20,7 @@ Students and freelancers who struggle to plan big goals.
 - Export to PDF
 
 ## Tech Stack
-Angular, .NET Web API, SQLite, Gemini/Groq (free tier)
+Angular, .NET Web API, SQL Server, Gemini/Groq (free tier)
 
 ## User Flow
 Login → Goal → Generate → Preview → Save → Task list

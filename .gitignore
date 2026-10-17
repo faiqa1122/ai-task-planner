@@ -1,0 +1,21 @@
+# .NET
+bin/
+obj/
+*.user
+appsettings.Development.json
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+
+# Secrets
+.env
+
+# Database
+*.db
+*.sqlite
+
+# Editor / OS
+.vscode/
+.DS_Store
