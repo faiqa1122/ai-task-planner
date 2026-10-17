@@ -4,6 +4,7 @@ using TaskPlanner.Api.Data;
 using TaskPlanner.Api.DTOs;
 using TaskPlanner.Api.Models;
 using TaskPlanner.Api.Services;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace TaskPlanner.Api.Controllers;
 
@@ -22,7 +23,7 @@ public class PlannerController : ControllerBase
     }
 
     private int UserId => int.Parse(User.FindFirst("sub")!.Value);
-
+    [EnableRateLimiting("ai")]
     [HttpPost("preview")]
     public async Task<ActionResult<PlanPreviewDto>> Preview(GeneratePlanDto dto, CancellationToken ct)
     {
