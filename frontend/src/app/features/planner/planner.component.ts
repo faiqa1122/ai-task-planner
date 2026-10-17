@@ -10,19 +10,7 @@ import { GoalSummary, PlannedTask, Priority } from '../../core/models';
   imports: [ReactiveFormsModule],
   template: `
     <div class="mx-auto max-w-4xl p-6">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-indigo-600">AI Task Planner</h1>
-        <div class="flex items-center gap-3">
-          <span class="text-sm text-gray-600">{{ auth.user()?.name }}</span>
-          <button
-            (click)="auth.logout()"
-            class="rounded-lg border border-gray-300 px-3 py-1 text-sm hover:bg-gray-100"
-          >
-            Log out
-          </button>
-        </div>
-      </div>
-
+      
       <!-- Step 1: goal form -->
       <form [formGroup]="form" (ngSubmit)="generate()" class="mt-6 space-y-4 rounded-2xl bg-white p-6 shadow">
         <h2 class="text-lg font-semibold text-gray-800">What is your goal?</h2>

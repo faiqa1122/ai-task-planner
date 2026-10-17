@@ -54,3 +54,24 @@ export interface GoalSummary {
   taskCount: number;
   doneCount: number;
 }
+
+export interface TaskItem {
+  id: number;
+  goalId: number;
+  title: string;
+  description: string | null;
+  priority: Priority;
+  estimatedHours: number | null;
+  status: TaskStatus;
+  dueDate: string | null;
+  sortOrder: number;
+}
+
+export interface TaskSaveRequest {
+  title: string;
+  description: string | null;
+  priority: Priority;
+  estimatedHours: number | null;
+  dueDate: string | null;
+  status: TaskStatus;
+}
