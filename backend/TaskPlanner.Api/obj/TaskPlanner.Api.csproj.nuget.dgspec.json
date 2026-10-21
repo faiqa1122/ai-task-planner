@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.Api\\TaskPlanner.Api.csproj": {}
+    "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.API\\TaskPlanner.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.Api\\TaskPlanner.Api.csproj": {
+    "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.API\\TaskPlanner.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.Api\\TaskPlanner.Api.csproj",
+        "projectUniqueName": "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.API\\TaskPlanner.Api.csproj",
         "projectName": "TaskPlanner.Api",
-        "projectPath": "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.Api\\TaskPlanner.Api.csproj",
+        "projectPath": "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.API\\TaskPlanner.Api.csproj",
         "packagesPath": "C:\\Users\\Junction\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.Api\\obj\\",
+        "outputPath": "C:\\Users\\Junction\\Desktop\\ai-task-planner\\backend\\TaskPlanner.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

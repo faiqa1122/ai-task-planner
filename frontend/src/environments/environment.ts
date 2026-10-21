@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:5140/api'
+  production: true,
+  apiUrl: 'https://aitaskplanner.runasp.net/api'
 };
