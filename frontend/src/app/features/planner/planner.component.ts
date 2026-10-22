@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/auth.service';
 import { PlannerService } from '../../core/planner.service';
 import { GoalSummary, PlannedTask, Priority } from '../../core/models';
+import { ToastService } from '../../core/toast.service';
 
 @Component({
   selector: 'app-planner',
@@ -128,6 +129,7 @@ export class PlannerComponent {
   auth = inject(AuthService);
   private planner = inject(PlannerService);
   private fb = inject(FormBuilder);
+    private toast = inject(ToastService);
 
   readonly priorities: Priority[] = ['Low', 'Medium', 'High'];
 
@@ -206,6 +208,7 @@ export class PlannerComponent {
         next: (goal) => {
           this.saving.set(false);
           this.saved.set(goal);
+           this.toast.success('Plan saved');
         },
         error: (err: HttpErrorResponse) => {
           this.saving.set(false);

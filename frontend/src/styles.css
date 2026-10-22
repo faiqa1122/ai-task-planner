@@ -1,27 +1,64 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-
-  --color-canvas: #0e1116;
-  --color-surface: #171b22;
-  --color-card: #1e232c;
-  --color-line: #262c36;
-  --color-line-strong: #2a313c;
-  --color-ink: #e8ecf2;
-  --color-muted: #98a2b3;
-  --color-accent: #c6f432;
-
-  --color-high: #ff9c8d;
-  --color-high-bg: #3a1f1c;
-  --color-warn: #f5c76b;
-  --color-warn-bg: #3a2f17;
-  --color-ok: #7be0a6;
-  --color-ok-bg: #17301f;
+/* LIGHT theme (default) */
+:root {
+  color-scheme: light;
+  --canvas: #faf7f0;
+  --surface: #ffffff;
+  --card: #f6f2e8;
+  --line: #e6e0d2;
+  --line-strong: #d9d2c0;
+  --ink: #1f2a24;
+  --muted: #5b645e;
+  --accent: #1f5c45;
+  --on-accent: #faf7f0;
+  --high: #8f3320;
+  --high-bg: #f6ddd5;
+  --warn: #6f4d00;
+  --warn-bg: #f5e7c2;
+  --ok: #1f5c45;
+  --ok-bg: #dcebe2;
 }
 
-html {
+/* DARK theme */
+[data-theme="dark"] {
   color-scheme: dark;
+  --canvas: #0e1116;
+  --surface: #171b22;
+  --card: #1e232c;
+  --line: #262c36;
+  --line-strong: #2a313c;
+  --ink: #e8ecf2;
+  --muted: #98a2b3;
+  --accent: #c6f432;
+  --on-accent: #0e1116;
+  --high: #ff9c8d;
+  --high-bg: #3a1f1c;
+  --warn: #f5c76b;
+  --warn-bg: #3a2f17;
+  --ok: #7be0a6;
+  --ok-bg: #17301f;
+}
+
+/* Tailwind ko batao ke ye naam in variables se aate hain */
+@theme inline {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-high: var(--high);
+  --color-high-bg: var(--high-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
 }
 
 body {
@@ -30,7 +67,7 @@ body {
 
 @layer components {
   .panel {
-    @apply rounded-2xl border border-line bg-surface p-5;
+    @apply rounded-2xl border border-line bg-surface p-5 shadow-sm shadow-black/5;
   }
   .card {
     @apply rounded-xl border border-line-strong bg-card p-3.5;
@@ -42,10 +79,13 @@ body {
     @apply mt-1 w-full rounded-lg border border-line-strong bg-canvas px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none;
   }
   .btn {
-    @apply rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-canvas transition hover:brightness-110 disabled:opacity-50;
+    @apply rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:brightness-110 disabled:opacity-50;
   }
   .btn-ghost {
     @apply rounded-lg border border-line-strong px-3 py-2 text-sm text-ink transition hover:bg-card;
+  }
+    .btn-danger {
+    @apply rounded-lg bg-high px-4 py-2 text-sm font-semibold text-canvas transition hover:brightness-110;
   }
   .chip {
     @apply rounded-md px-2 py-0.5 text-xs font-semibold;
@@ -69,6 +109,9 @@ body {
     @apply rounded-lg px-3 py-2 text-sm text-muted transition hover:text-ink;
   }
   .nav-link-active {
-    @apply bg-accent font-semibold text-canvas hover:text-canvas;
+    @apply bg-accent font-semibold text-on-accent hover:text-on-accent;
+  }
+    .skeleton {
+    @apply animate-pulse rounded-md bg-line motion-reduce:animate-none;
   }
 }

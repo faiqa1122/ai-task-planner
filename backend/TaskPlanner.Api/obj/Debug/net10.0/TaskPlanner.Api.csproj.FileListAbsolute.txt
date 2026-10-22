@@ -168,3 +168,9 @@ C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.Api\bin\Debug\net1
 C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.Api\bin\Debug\net10.0\BCrypt-Net-Next.dll
 C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.Api\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.Api\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.API\bin\Debug\net10.0\publish\web.config
+C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.API\bin\Debug\net10.0\publish\appsettings.Development.json
+C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.API\bin\Debug\net10.0\publish\appsettings.json
+C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.API\bin\Debug\net10.0\publish\TaskPlanner.Api.deps.json
+C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.API\bin\Debug\net10.0\publish\TaskPlanner.Api.runtimeconfig.json
+C:\Users\Junction\Desktop\ai-task-planner\backend\TaskPlanner.API\bin\Debug\net10.0\publish\TaskPlanner.Api.staticwebassets.endpoints.json

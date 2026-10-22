@@ -3,12 +3,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
-
+import { ThemeToggleComponent } from '../../shared/theme-toggle.component';
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, ThemeToggleComponent],
   template: `
-    <div class="flex min-h-screen items-center justify-center p-4">
+   <div class="relative flex min-h-screen items-center justify-center p-4">
+  <div class="absolute top-4 right-4"><app-theme-toggle /></div>
   <div class="panel w-full max-w-md p-8">
     <div class="text-2xl font-bold">Task<span class="text-accent">Planner</span></div>
     <p class="mt-1 text-sm text-muted">Log in to continue</p>

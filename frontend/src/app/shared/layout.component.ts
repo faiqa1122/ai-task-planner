@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth.service';
+import { ThemeToggleComponent } from './theme-toggle.component';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, ThemeToggleComponent],
   template: `
    <div class="min-h-screen md:flex">
   <aside
@@ -17,10 +18,13 @@ import { AuthService } from '../core/auth.service';
       <a routerLink="/planner" routerLinkActive="nav-link-active" class="nav-link">New plan</a>
       <a routerLink="/goals" routerLinkActive="nav-link-active" class="nav-link">My goals</a>
     </nav>
-    <div class="ml-auto flex items-center gap-2 md:mt-auto md:ml-0 md:flex-col md:items-stretch">
-     <span class="px-3 text-sm text-muted">{{ auth.user()?.['name'] }}</span>
-      <button (click)="auth.logout()" class="btn-ghost">Log out</button>
-    </div>
+   <div class="ml-auto flex items-center gap-2 md:mt-auto md:ml-0 md:flex-col md:items-stretch">
+  <div class="flex items-center justify-between gap-2">
+   <span class="px-3 text-sm text-muted">{{ auth.user()?.['name'] }}</span>
+    <app-theme-toggle />
+  </div>
+  <button (click)="auth.logout()" class="btn-ghost">Log out</button>
+</div>
   </aside>
   <main class="flex-1 p-4 md:p-8">
     <div class="mx-auto max-w-5xl">

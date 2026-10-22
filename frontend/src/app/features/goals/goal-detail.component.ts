@@ -5,6 +5,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { GoalsService } from '../../core/goals.service';
 import { GoalSummary, Priority, TaskItem, TaskStatus } from '../../core/models';
+import { ConfirmService } from '../../core/confirm.service';
+import { ToastService } from '../../core/toast.service';
 
 @Component({
   selector: 'app-goal-detail',
@@ -12,150 +14,176 @@ import { GoalSummary, Priority, TaskItem, TaskStatus } from '../../core/models';
   template: `
     <a routerLink="/goals" class="text-sm text-muted hover:text-accent">← Back to goals</a>
 
-@if (loading()) {
-  <p class="mt-4 text-muted">Loading...</p>
-} @else if (goal()) {
-  <div class="mt-4 flex items-end justify-between gap-4">
-    <div>
-      <p class="label">Goal</p>
-      <h1 class="mt-1 text-3xl font-semibold">{{ goal()!.title }}</h1>
-      @if (goal()!.description) {
-        <p class="mt-1 text-sm text-muted">{{ goal()!.description }}</p>
+    @if (loading()) {
+      <div class="mt-4 space-y-3">
+        <div class="skeleton h-3 w-16"></div>
+        <div class="skeleton h-8 w-2/3"></div>
+        <div class="skeleton h-2 w-full"></div>
+      </div>
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="panel space-y-3 p-3.5">
+            <div class="skeleton h-3 w-20"></div>
+            <div class="skeleton h-24 w-full"></div>
+            <div class="skeleton h-24 w-full"></div>
+          </div>
+        }
+      </div>
+    } @else if (goal()) {
+      <div class="mt-4 flex items-end justify-between gap-4">
+        <div>
+          <p class="label">Goal</p>
+          <h1 class="mt-1 text-3xl font-semibold">{{ goal()!.title }}</h1>
+          @if (goal()!.description) {
+            <p class="mt-1 text-sm text-muted">{{ goal()!.description }}</p>
+          }
+          @if (goal()!.deadline) {
+            <p class="mt-1 text-xs text-muted">
+              Deadline: {{ goal()!.deadline | date: 'mediumDate' }}
+            </p>
+          }
+        </div>
+        <div class="text-5xl leading-none font-bold text-accent">{{ percent() }}%</div>
+      </div>
+
+      <div class="mt-4 h-2 rounded-full bg-line">
+        <div class="h-2 rounded-full bg-accent" [style.width.%]="percent()"></div>
+      </div>
+      <p class="mt-2 text-xs text-muted">{{ doneCount() }} of {{ tasks().length }} tasks done</p>
+
+      @if (error()) {
+        <p class="error-box mt-4">{{ error() }}</p>
       }
-      @if (goal()!.deadline) {
-        <p class="mt-1 text-xs text-muted">Deadline: {{ goal()!.deadline | date: 'mediumDate' }}</p>
-      }
-    </div>
-    <div class="text-5xl leading-none font-bold text-accent">{{ percent() }}%</div>
-  </div>
 
-  <div class="mt-4 h-2 rounded-full bg-line">
-    <div class="h-2 rounded-full bg-accent" [style.width.%]="percent()"></div>
-  </div>
-  <p class="mt-2 text-xs text-muted">{{ doneCount() }} of {{ tasks().length }} tasks done</p>
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        @for (col of columns(); track col.status) {
+          <div class="panel space-y-3 p-3.5">
+            <h2
+              class="flex justify-between text-xs font-semibold tracking-wider text-muted uppercase"
+            >
+              <span>{{ col.label }}</span>
+              <span>{{ col.items.length }}</span>
+            </h2>
 
-  @if (error()) {
-    <p class="error-box mt-4">{{ error() }}</p>
-  }
-
-  <div class="mt-6 grid gap-4 md:grid-cols-3">
-    @for (col of columns(); track col.status) {
-      <div class="panel space-y-3 p-3.5">
-        <h2 class="flex justify-between text-xs font-semibold tracking-wider text-muted uppercase">
-          <span>{{ col.label }}</span>
-          <span>{{ col.items.length }}</span>
-        </h2>
-
-        @for (t of col.items; track t.id) {
-          <div class="card">
-            @if (editingId() === t.id) {
-              <input
-                type="text"
-                [value]="editTitle()"
-                (input)="editTitle.set(text($event))"
-                class="field mt-0"
-              />
-              <div class="mt-2 flex gap-2">
-                <select (change)="editPriority.set(priority($event))" class="field mt-0 w-auto">
-                  @for (p of priorities; track p) {
-                    <option [value]="p" [selected]="editPriority() === p">{{ p }}</option>
+            @for (t of col.items; track t.id) {
+              <div class="card">
+                @if (editingId() === t.id) {
+                  <input
+                    type="text"
+                    [value]="editTitle()"
+                    (input)="editTitle.set(text($event))"
+                    class="field mt-0"
+                  />
+                  <div class="mt-2 flex gap-2">
+                    <select
+                      (change)="editPriority.set(priority($event))"
+                      class="field mt-0 w-auto"
+                    >
+                      @for (p of priorities; track p) {
+                        <option [value]="p" [selected]="editPriority() === p">{{ p }}</option>
+                      }
+                    </select>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      [value]="editHours() ?? ''"
+                      (input)="editHours.set(num($event))"
+                      placeholder="Hours"
+                      class="field mt-0 w-20"
+                    />
+                  </div>
+                  <div class="mt-2 flex gap-2">
+                    <button (click)="saveEdit(t)" class="btn px-3 py-1 text-xs">Save</button>
+                    <button (click)="editingId.set(null)" class="btn-ghost px-3 py-1 text-xs">
+                      Cancel
+                    </button>
+                  </div>
+                } @else {
+                  <p
+                    class="text-sm font-semibold"
+                    [class.text-muted]="t.status === 'Done'"
+                    [class.line-through]="t.status === 'Done'"
+                  >
+                    {{ t.title }}
+                  </p>
+                  @if (t.description) {
+                    <p class="mt-1 text-xs text-muted">{{ t.description }}</p>
                   }
-                </select>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  [value]="editHours() ?? ''"
-                  (input)="editHours.set(num($event))"
-                  placeholder="Hours"
-                  class="field mt-0 w-20"
-                />
-              </div>
-              <div class="mt-2 flex gap-2">
-                <button (click)="saveEdit(t)" class="btn px-3 py-1 text-xs">Save</button>
-                <button (click)="editingId.set(null)" class="btn-ghost px-3 py-1 text-xs">Cancel</button>
-              </div>
-            } @else {
-              <p
-                class="text-sm font-semibold"
-                [class.text-muted]="t.status === 'Done'"
-                [class.line-through]="t.status === 'Done'"
-              >
-                {{ t.title }}
-              </p>
-              @if (t.description) {
-                <p class="mt-1 text-xs text-muted">{{ t.description }}</p>
-              }
-              <div class="mt-2 flex items-center gap-2 text-xs">
-                <span [class]="badge(t.priority)">{{ t.priority }}</span>
-                @if (t.estimatedHours) {
-                  <span class="text-muted">{{ t.estimatedHours }}h</span>
+                  <div class="mt-2 flex items-center gap-2 text-xs">
+                    <span [class]="badge(t.priority)">{{ t.priority }}</span>
+                    @if (t.estimatedHours) {
+                      <span class="text-muted">{{ t.estimatedHours }}h</span>
+                    }
+                  </div>
+                  <div class="mt-3 flex items-center justify-between">
+                    <div class="flex gap-1">
+                      @if (canMove(t, -1)) {
+                        <button
+                          (click)="move(t, -1)"
+                          class="rounded-md border border-line-strong px-2 text-sm text-muted hover:text-ink"
+                          aria-label="Move back"
+                        >
+                          ←
+                        </button>
+                      }
+                      @if (canMove(t, 1)) {
+                        <button
+                          (click)="move(t, 1)"
+                          class="rounded-md border border-line-strong px-2 text-sm text-muted hover:text-ink"
+                          aria-label="Move forward"
+                        >
+                          →
+                        </button>
+                      }
+                    </div>
+                    <div class="flex gap-1">
+                      <button
+                        (click)="startEdit(t)"
+                        class="rounded-md px-2 text-sm text-muted hover:text-ink"
+                        aria-label="Edit task"
+                      >
+                        ✎
+                      </button>
+                      <button
+                        (click)="removeTask(t)"
+                        class="rounded-md px-2 text-sm text-high hover:bg-high-bg"
+                        aria-label="Delete task"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
                 }
               </div>
-              <div class="mt-3 flex items-center justify-between">
-                <div class="flex gap-1">
-                  @if (canMove(t, -1)) {
-                    <button
-                      (click)="move(t, -1)"
-                      class="rounded-md border border-line-strong px-2 text-sm text-muted hover:text-ink"
-                      aria-label="Move back"
-                    >
-                      ←
-                    </button>
-                  }
-                  @if (canMove(t, 1)) {
-                    <button
-                      (click)="move(t, 1)"
-                      class="rounded-md border border-line-strong px-2 text-sm text-muted hover:text-ink"
-                      aria-label="Move forward"
-                    >
-                      →
-                    </button>
-                  }
-                </div>
-                <div class="flex gap-1">
-                  <button
-                    (click)="startEdit(t)"
-                    class="rounded-md px-2 text-sm text-muted hover:text-ink"
-                    aria-label="Edit task"
-                  >
-                    ✎
-                  </button>
-                  <button
-                    (click)="removeTask(t)"
-                    class="rounded-md px-2 text-sm text-high hover:bg-high-bg"
-                    aria-label="Delete task"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
+            } @empty {
+              <p class="px-1 py-6 text-center text-xs text-muted">No tasks here</p>
             }
           </div>
         }
       </div>
-    }
-  </div>
 
-  <div class="panel mt-4 flex gap-2">
-    <input
-      type="text"
-      [value]="newTitle()"
-      (input)="newTitle.set(text($event))"
-      (keyup.enter)="addTask()"
-      placeholder="Add a new task..."
-      class="field mt-0 flex-1"
-    />
-    <button (click)="addTask()" class="btn">Add</button>
-  </div>
-} @else {
-  <p class="error-box mt-4">{{ error() }}</p>
-}
+      <div class="panel mt-4 flex gap-2">
+        <input
+          type="text"
+          [value]="newTitle()"
+          (input)="newTitle.set(text($event))"
+          (keyup.enter)="addTask()"
+          placeholder="Add a new task..."
+          class="field mt-0 flex-1"
+        />
+        <button (click)="addTask()" class="btn">Add</button>
+      </div>
+    } @else {
+      <p class="error-box mt-4">{{ error() }}</p>
+    }
   `,
 })
 export class GoalDetailComponent implements OnInit {
   private api = inject(GoalsService);
   private route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
+  private confirm = inject(ConfirmService);
 
   readonly priorities: Priority[] = ['Low', 'Medium', 'High'];
   readonly statuses: TaskStatus[] = ['Todo', 'InProgress', 'Done'];
@@ -214,11 +242,13 @@ export class GoalDetailComponent implements OnInit {
 
   move(t: TaskItem, dir: number) {
     const next = this.statuses[this.statuses.indexOf(t.status) + dir];
-    this.error.set('');
 
     this.api.changeStatus(t.id, next).subscribe({
-      next: (updated) => this.replace(updated),
-      error: () => this.error.set('Could not change the status.'),
+      next: (updated) => {
+        this.replace(updated);
+        this.toast.success(`Moved to ${this.labels[next]}`);
+      },
+      error: () => this.toast.error('Could not change the status.'),
     });
   }
 
@@ -232,10 +262,9 @@ export class GoalDetailComponent implements OnInit {
   saveEdit(t: TaskItem) {
     const title = this.editTitle().trim();
     if (!title) {
-      this.error.set('Task title cannot be empty.');
+      this.toast.error('Task title cannot be empty.');
       return;
     }
-    this.error.set('');
 
     this.api
       .updateTask(t.id, {
@@ -250,15 +279,15 @@ export class GoalDetailComponent implements OnInit {
         next: (updated) => {
           this.replace(updated);
           this.editingId.set(null);
+          this.toast.success('Task updated');
         },
-        error: () => this.error.set('Could not save the task.'),
+        error: () => this.toast.error('Could not save the task.'),
       });
   }
 
   addTask() {
     const title = this.newTitle().trim();
     if (!title) return;
-    this.error.set('');
 
     this.api
       .addTask(this.goal()!.id, {
@@ -273,21 +302,31 @@ export class GoalDetailComponent implements OnInit {
         next: (created) => {
           this.tasks.update((list) => [...list, created]);
           this.newTitle.set('');
+          this.toast.success('Task added');
         },
-        error: () => this.error.set('Could not add the task.'),
+        error: () => this.toast.error('Could not add the task.'),
       });
   }
 
-  removeTask(t: TaskItem) {
-    if (!confirm(`Delete "${t.title}"?`)) return;
+  async removeTask(t: TaskItem) {
+    const ok = await this.confirm.ask({
+      title: 'Delete task?',
+      message: `"${t.title}" will be deleted.`,
+      confirmText: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
 
     this.api.deleteTask(t.id).subscribe({
-      next: () => this.tasks.update((list) => list.filter((x) => x.id !== t.id)),
-      error: () => this.error.set('Could not delete the task.'),
+      next: () => {
+        this.tasks.update((list) => list.filter((x) => x.id !== t.id));
+        this.toast.success('Task deleted');
+      },
+      error: () => this.toast.error('Could not delete the task.'),
     });
   }
 
-    badge(p: Priority): string {
+  badge(p: Priority): string {
     switch (p) {
       case 'High':
         return 'chip chip-high';
